@@ -15,6 +15,7 @@ async function init() {
 
   // Scene setup
   const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x009999);
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   const renderer = new THREE.WebGLRenderer();
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -25,20 +26,36 @@ async function init() {
   const textureLoader = new THREE.TextureLoader();
   const texture = textureLoader.load('textures/texture.jpg');
 
-
-  // Shader Material
-  const material = new THREE.ShaderMaterial({
+  const backMaterial = new THREE.ShaderMaterial({
     vertexShader,
     fragmentShader,
     uniforms: {
       uTexture: { type: 't' , value: texture },
-    }
+    },
+    transparent: true,
+    side: THREE.BackSide,
   });
 
-  // Box
+  // Shader Material for front faces
+  const frontMaterial = new THREE.ShaderMaterial({
+    vertexShader,
+    fragmentShader,
+    uniforms: {
+      uTexture: { type: 't' , value: texture },
+    },
+    transparent: true,
+    side: THREE.FrontSide,
+  });
+
   const geometry = new THREE.BoxGeometry();
-  const box = new THREE.Mesh(geometry, material);
-  scene.add(box);
+
+  // Box for back faces
+  const backBox = new THREE.Mesh(geometry, backMaterial);
+  scene.add(backBox);
+
+  // Box for front faces
+  const frontBox = new THREE.Mesh(geometry, frontMaterial);
+  scene.add(frontBox);
 
   // Camera Position
   camera.position.z = 3;

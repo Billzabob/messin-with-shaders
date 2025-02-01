@@ -33,7 +33,8 @@ void main() {
   float ambientIntensity = 0.0;
   vec4 textureColor = texture2D(uTexture, vUv);
 
-  float noiseValue = noise(vUv * 10.0) * 2.0; // Scale the UVs for noise
+  float noiseValue = noise(vUv * 10.0) * 20.0; // Scale the UVs for noise
   float brightness = ambientIntensity + lightIntensity + noiseValue; // Adjust the noise influence
-  gl_FragColor = vec4(textureColor.rgb * noiseValue, textureColor.a);
+  float newNoiseValue = min(1.0, max(0.0, noiseValue));
+  gl_FragColor = vec4(textureColor.rgb, textureColor.a * newNoiseValue);
 }
