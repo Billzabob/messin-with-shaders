@@ -21,16 +21,18 @@ async function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // Define the uniform
-  const uniforms = {
-    uColor: { value: new THREE.Color(0xff0000) } // Red color
-  };
+  // Load texture
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load('textures/texture.jpg');
+
 
   // Shader Material
   const material = new THREE.ShaderMaterial({
     vertexShader,
     fragmentShader,
-    uniforms
+    uniforms: {
+      uTexture: { type: 't' , value: texture },
+    }
   });
 
   // Box
