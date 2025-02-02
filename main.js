@@ -33,29 +33,16 @@ async function init() {
       uTexture: { type: 't' , value: texture },
     },
     transparent: true,
-    side: THREE.BackSide,
+    depthWrite: false,
+    forceSinglePass: true,
+    side: THREE.DoubleSide,
   });
 
-  // Shader Material for front faces
-  const frontMaterial = new THREE.ShaderMaterial({
-    vertexShader,
-    fragmentShader,
-    uniforms: {
-      uTexture: { type: 't' , value: texture },
-    },
-    transparent: true,
-    side: THREE.FrontSide,
-  });
-
-  const geometry = new THREE.BoxGeometry();
+  const geometry = new THREE.BoxGeometry(2, 2, 2);
 
   // Box for back faces
   const backBox = new THREE.Mesh(geometry, backMaterial);
   scene.add(backBox);
-
-  // Box for front faces
-  const frontBox = new THREE.Mesh(geometry, frontMaterial);
-  scene.add(frontBox);
 
   // Camera Position
   camera.position.z = 3;
