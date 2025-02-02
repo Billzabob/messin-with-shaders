@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+// Inspired by https://dissolve-particles.vercel.app/
+// From: https://x.com/0xjatinchopra/status/1884290238840988005
+
 // Function to load shader files
 async function loadShader(url) {
   const response = await fetch(url);
@@ -31,7 +34,7 @@ async function init() {
     fragmentShader,
     uniforms: {
       uTexture: { type: 't' , value: texture },
-      uTime: { type: 'f', value: 0.0 },
+      uProgress: { type: 'f', value: 0.0 },
     },
     transparent: true,
     depthTest: false,
@@ -52,7 +55,6 @@ async function init() {
   // Animation Loop
   function animate() {
     requestAnimationFrame(animate);
-    material.uniforms.uTime.value += 0.01;
     controls.update();
     renderer.render(scene, camera);
   }
@@ -63,6 +65,11 @@ async function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+  });
+  
+  const progressSlider = document.getElementById('progressSlider');
+  progressSlider.addEventListener('input', (event) => {
+    material.uniforms.uProgress.value = parseFloat(event.target.value);
   });
 }
 

@@ -1,5 +1,5 @@
 uniform sampler2D uTexture;
-uniform float uTime;
+uniform float uProgress;
 varying vec2 vUv;
 varying vec3 vNormal;
 
@@ -36,11 +36,11 @@ void main() {
   
   // float brightness = ambientIntensity + lightIntensity + noiseValue;
 
-  float noiseValue = (noise(vUv * 2.0) - 0.3 + uTime / 10.0) * 30.0;
+  float noiseValue = (noise(vUv * 2.0) + uProgress * 0.6 - 0.3) * 30.0;
   float newNoiseValue = 1.0 - min(1.0, max(0.0, noiseValue));
   
   if (newNoiseValue > 0.0 && newNoiseValue < 0.8) {
-    gl_FragColor = vec4(1.0, 0.0, 0.0, textureColor.a * newNoiseValue + 0.3);
+    gl_FragColor = vec4(1.0, 0.0, 0.0, textureColor.a);
   } else if (newNoiseValue == 0.0) {
     gl_FragColor = vec4(textureColor.rgb, 0.0);
   } else  {
