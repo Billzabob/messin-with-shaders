@@ -34,8 +34,8 @@ async function init() {
       uTime: { type: 'f', value: 0.0 },
     },
     transparent: true,
-    depthWrite: false,
-    forceSinglePass: true,
+    depthTest: false,
+    forceSinglePass: false,
     side: THREE.DoubleSide,
   });
 
