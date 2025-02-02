@@ -26,11 +26,12 @@ async function init() {
   const textureLoader = new THREE.TextureLoader();
   const texture = textureLoader.load('textures/texture.jpg');
 
-  const backMaterial = new THREE.ShaderMaterial({
+  const material = new THREE.ShaderMaterial({
     vertexShader,
     fragmentShader,
     uniforms: {
       uTexture: { type: 't' , value: texture },
+      uTime: { type: 'f', value: 0.0 },
     },
     transparent: true,
     depthWrite: false,
@@ -41,7 +42,7 @@ async function init() {
   const geometry = new THREE.BoxGeometry(2, 2, 2);
 
   // Box for back faces
-  const backBox = new THREE.Mesh(geometry, backMaterial);
+  const backBox = new THREE.Mesh(geometry, material);
   scene.add(backBox);
 
   // Camera Position
@@ -51,6 +52,7 @@ async function init() {
   // Animation Loop
   function animate() {
     requestAnimationFrame(animate);
+    material.uniforms.uTime.value += 0.01;
     controls.update();
     renderer.render(scene, camera);
   }
