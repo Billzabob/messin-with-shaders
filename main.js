@@ -1,5 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import {
+  EffectComposer,
+  RenderPass,
+  ShaderPass
+} from 'three/examples/jsm/Addons.js';
 import GUI from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
 // Inspired by https://dissolve-particles.vercel.app/
@@ -12,8 +17,10 @@ async function loadShader(url) {
 }
 
 // Load shaders
-const vertexShader = await loadShader('shaders/vertexShader.glsl');
-const fragmentShader = await loadShader('shaders/fragmentShader.glsl');
+const cubeVertexShader = await loadShader('shaders/cube/vertexShader.glsl');
+const cubeFragmentShader = await loadShader('shaders/cube/fragmentShader.glsl');
+const postVertexShader = await loadShader('shaders/post/vertextShader.glsl');
+const postFragmentShader = await loadShader('shaders/post/fragmentShader.glsl');
 
 // Scene setup
 const scene = new THREE.Scene();
@@ -30,13 +37,31 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setAnimationLoop(animate);
 document.body.appendChild(renderer.domElement);
 
+const composer = new EffectComposer(renderer);
+const renderPass = new RenderPass(scene, camera);
+composer.addPass(renderPass);
+
+const customShader = {
+  uniforms: {
+    tDiffuse: { value: null },
+    resolution: {
+      value: new THREE.Vector2(window.innerWidth, window.innerHeight)
+    }
+  },
+  vertexShader: postVertexShader,
+  fragmentShader: postFragmentShader
+};
+
+const shaderPass = new ShaderPass(customShader);
+composer.addPass(shaderPass);
+
 // Load texture
 const textureLoader = new THREE.TextureLoader();
 const texture = textureLoader.load('textures/texture.jpg');
 
 const material = new THREE.ShaderMaterial({
-  vertexShader,
-  fragmentShader,
+  vertexShader: cubeVertexShader,
+  fragmentShader: cubeFragmentShader,
   uniforms: {
     uTexture: { type: 't', value: texture },
     uProgress: { type: 'f', value: 0.0 },
@@ -58,7 +83,7 @@ camera.position.z = 3;
 
 function animate() {
   controls.update();
-  renderer.render(scene, camera);
+  composer.render(scene, camera);
 }
 
 const gui = new GUI();
@@ -90,6 +115,10 @@ gui
 
 window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
+  shaderPass.uniforms['resolution'].value.set(
+    window.innerWidth,
+    window.innerHeight
+  );
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 });
