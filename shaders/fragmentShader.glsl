@@ -1,5 +1,7 @@
 uniform sampler2D uTexture;
 uniform float uProgress;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
 varying vec2 vUv;
 varying vec3 vNormal;
 
@@ -38,7 +40,7 @@ void main() {
   
   if (newNoiseValue > 0.0 && newNoiseValue < 0.2) {
     float t = smoothstep(0.0, 0.2, newNoiseValue);
-    vec3 interpolatedColor = mix(vec3(1.0, 0.6, 0.6), vec3(1.0, 0.1, 0.1), t);
+    vec3 interpolatedColor = mix(uColor1, uColor2, t);
     gl_FragColor = vec4(interpolatedColor, textureColor.a);
   } else if (newNoiseValue == 0.0) {
     gl_FragColor = vec4(textureColor.rgb, 0.0);
