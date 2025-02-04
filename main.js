@@ -2,8 +2,10 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import {
   EffectComposer,
+  OutputPass,
   RenderPass,
-  ShaderPass
+  ShaderPass,
+  UnrealBloomPass
 } from 'three/examples/jsm/Addons.js';
 import GUI from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
@@ -39,7 +41,6 @@ document.body.appendChild(renderer.domElement);
 
 const composer = new EffectComposer(renderer);
 const renderPass = new RenderPass(scene, camera);
-composer.addPass(renderPass);
 
 const customShader = {
   uniforms: {
@@ -53,7 +54,18 @@ const customShader = {
 };
 
 const shaderPass = new ShaderPass(customShader);
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  1.5,
+  0.4,
+  0.85
+);
+const outputPass = new OutputPass();
+
+composer.addPass(renderPass);
 composer.addPass(shaderPass);
+composer.addPass(bloomPass);
+composer.addPass(outputPass);
 
 // Load texture
 const textureLoader = new THREE.TextureLoader();
@@ -119,6 +131,7 @@ window.addEventListener('resize', () => {
     window.innerWidth,
     window.innerHeight
   );
+  bloomPass.resolution.set(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 });
