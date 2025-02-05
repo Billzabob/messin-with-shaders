@@ -8,23 +8,21 @@ import {
   UnrealBloomPass
 } from 'three/examples/jsm/Addons.js';
 import GUI from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 
 // Inspired by https://dissolve-particles.vercel.app/
 // From: https://x.com/0xjatinchopra/status/1884290238840988005
 
-// Function to load shader files
 async function loadShader(url) {
   const response = await fetch(url);
   return await response.text();
 }
 
-// Load shaders
 const cubeVertexShader = await loadShader('shaders/cube/vertexShader.glsl');
 const cubeFragmentShader = await loadShader('shaders/cube/fragmentShader.glsl');
 const postVertexShader = await loadShader('shaders/post/vertextShader.glsl');
 const postFragmentShader = await loadShader('shaders/post/fragmentShader.glsl');
 
-// Scene setup
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x009999);
 const camera = new THREE.PerspectiveCamera(
@@ -64,7 +62,7 @@ const outputPass = new OutputPass();
 
 composer.addPass(renderPass);
 composer.addPass(shaderPass);
-composer.addPass(bloomPass);
+// composer.addPass(bloomPass);
 composer.addPass(outputPass);
 
 // Load texture
@@ -93,8 +91,12 @@ scene.add(box);
 
 camera.position.z = 3;
 
+const stats = new Stats();
+document.body.appendChild(stats.dom);
+
 function animate() {
   controls.update();
+  stats.update();
   composer.render(scene, camera);
 }
 
@@ -103,6 +105,10 @@ const gui = new GUI();
 gui.add({ progress: 0 }, 'progress', 0, 1, 0.01).onChange((value) => {
   material.uniforms.uProgress.value = value;
 });
+
+gui.add(bloomPass, 'strength', 0, 5, 0.01).name('Strength');
+gui.add(bloomPass, 'radius', -1, 1, 0.01).name('Radius');
+gui.add(bloomPass, 'threshold', 0, 1, 0.01).name('Threshold');
 
 gui
   .addColor({ color: '#009999' }, 'color')
